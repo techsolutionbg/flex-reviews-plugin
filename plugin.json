@@ -1,0 +1,40 @@
+{
+  "id": "flex/reviews",
+  "name": "Flex Reviews",
+  "version": "0.1.2",
+  "description": "Коментари и оценки за продукти с модерация.",
+  "minimum_platform_version": "0.1.55",
+  "entrypoint": "Flex\\Reviews\\ReviewsPlugin",
+  "autoload": {
+    "Flex\\Reviews\\": "src/"
+  },
+  "permissions": [
+    "admin.ui",
+    "routes.admin",
+    "routes.public",
+    "frontend.assets"
+  ],
+  "frontend": {
+    "scripts": [
+      "assets/admin.js",
+      "assets/reviews.js"
+    ],
+    "styles": [
+      "assets/reviews.css"
+    ],
+    "public": {
+      "scripts": [
+        "assets/reviews.js"
+      ],
+      "styles": [
+        "assets/reviews.css"
+      ]
+    }
+  },
+  "metadata": {
+    "storage": "database",
+    "requires": [
+      "flex/commerce"
+    ]
+  }
+}
