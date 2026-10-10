@@ -1,6 +1,8 @@
 export function createPage(host) {
   const {React, components: C, request, toast, icons} = host;
   const h = React.createElement, base = '/admin/plugins/flex/reviews';
+  // Platform time standard (0.1.59+); older platforms show the stored UTC value.
+  const when = (value, style) => C.DateTime ? h(C.DateTime, {value, style}) : (value || '—');
   const states = {pending: 'Чакащи', approved: 'Одобрени', spam: 'Спам', trash: 'Кошче'};
   function Select({value, options, onChange, label, hint}) {
     return h('label', {className: 'react-form-field'}, label,
@@ -207,7 +209,7 @@ export function createPage(host) {
       {key: 'product_name', label: 'Продукт', sortable: true, render: (r) => r.product_name ?? 'Изтрит продукт'},
       {key: 'rating', label: 'Оценка', sortable: true, sortValue: (r) => Number(r.rating ?? 0), render: (r) => r.rating ? r.rating + ' / 5' : '—'},
       {key: 'status', label: 'Статус', render: (r) => h('span', {className: 'react-status-badge status-' + (r.status === 'approved' ? 'active' : r.status === 'pending' ? 'draft' : 'inactive')}, states[r.status])},
-      {key: 'created_at', label: 'Дата', sortable: true},
+      {key: 'created_at', label: 'Дата', sortable: true, render: (r) => when(r.created_at), sortValue: (r) => host.time?.parse(r.created_at)?.valueOf() ?? r.created_at},
       {key: 'actions', label: 'Действия', render: (r) => h(C.TableActionsMenu, null,
         h(C.DropdownOption, {disabled: busy, onClick: () => edit(r)}, 'Преглед и отговор'),
         ...Object.entries(states).filter(([key]) => key !== r.status).map(([key, label]) => h(C.DropdownOption, {key, disabled: busy, onClick: () => action([r.id], key)}, key === 'approved' ? 'Одобри' : key === 'trash' ? 'Премести в кошчето' : key === 'spam' ? 'Отбележи като спам' : 'Върни за одобрение')))},

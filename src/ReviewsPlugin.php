@@ -9,6 +9,13 @@ final class ReviewsPlugin implements PluginInterface, BootablePluginInterface, U
     public function activate(PluginContext $context): void { (new ReviewStore())->install(); }
     public function deactivate(PluginContext $context): void {}
     public function uninstall(PluginContext $context): void { (new ReviewStore())->uninstall(); }
+    /** Stored times are UTC; /assets/flex-time.js shows them in the visitor's zone (platform 0.1.59+). */
+    public static function time(mixed $value, string $style = 'date'): string
+    {
+        if (class_exists(\Flex\Extension\V1\Time::class)) return \Flex\Extension\V1\Time::html($value, $style);
+        $date = is_string($value) && $value !== '' ? new \DateTimeImmutable($value, new \DateTimeZone('UTC')) : null;
+        return $date === null ? '' : '<time datetime="' . $date->format('Y-m-d\TH:i:s\Z') . '">' . $date->format('d.m.Y') . '</time>';
+    }
     public function boot(PluginContext $context): void
     {
         $context->routes?->add(['GET', 'POST'], '/product/{id:number}', PublicController::class, 'product-reviews', [\Flex\Session\CsrfMiddleware::class]);
@@ -22,6 +29,7 @@ final class ReviewsPlugin implements PluginInterface, BootablePluginInterface, U
             if (!$settings['enabled'] || ($data['quick_view'] ?? false)) return $tabs;
             $product = $data['product']; $listing = $store->listing((int) $product['id']);
             $twig = new \Twig\Environment(new \Twig\Loader\FilesystemLoader(__DIR__ . '/../templates'), ['autoescape' => 'html', 'strict_variables' => true]);
+            $twig->addFunction(new \Twig\TwigFunction('flex_time', [self::class, 'time'], ['is_safe' => ['html']]));
             $tabs[] = ['id' => 'reviews', 'label' => 'Коментари (' . $listing['count'] . ')', 'html' => $twig->render('reviews.twig', ['product' => $product, 'listing' => $listing, 'settings' => $settings])];
             return $tabs;
         });

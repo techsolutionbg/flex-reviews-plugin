@@ -1,3 +1,13 @@
+// Platform time module (0.1.59+): local time and "преди …". Without it the UTC date stays visible.
+const flexTime = import('/assets/flex-time.js').catch(() => null);
+function timeElement(value) {
+  const raw = String(value || ''), node = document.createElement('time');
+  node.textContent = raw.slice(0, 10).split('-').reverse().join('.');
+  node.dateTime = raw.replace(' ', 'T') + (/(Z|[+-]\d{2}:?\d{2})$/i.test(raw) ? '' : 'Z');
+  node.dataset.flexTime = 'date';
+  flexTime.then((time) => time?.enhance(node));
+  return node;
+}
 function initializeReviews() {
   document.querySelectorAll('[data-reviews-product]').forEach(root => {
     if (root.dataset.ready) return;
@@ -40,7 +50,7 @@ function initializeReviews() {
       const header=text('header',''), avatar=text('span',Array.from(answer.name)[0]||'?'); avatar.className='flex-review-avatar'; avatar.setAttribute('aria-hidden','true');
       const author=text('div',''); author.className='flex-review-author'; const name=text('strong',answer.name);
       if(answer.is_store){const badge=text('span','От магазина');badge.className='flex-store-badge';name.append(badge);}
-      author.append(name,text('time',answer.created_at.slice(0,10).split('-').reverse().join('.')));header.append(avatar,author);article.append(header);
+      author.append(name,timeElement(answer.created_at));header.append(avatar,author);article.append(header);
       if(answer.parent_name){const context=text('a','В отговор на '+answer.parent_name);context.className='flex-reply-context';context.href='#flex-review-'+answer.parent_id;context.dataset.reviewParent=answer.parent_id;article.append(context);}
       const body=text('p',answer.body);body.className='flex-review-body';article.append(body);
       if(root.dataset.userReplies==='1') article.append(replyButton(answer.id,answer.name));return article;
@@ -88,7 +98,7 @@ function initializeReviews() {
           const head = text('header', '');
           const avatar = text('span', Array.from(review.name.trim())[0]?.toLocaleUpperCase('bg') || '?'); avatar.className = 'flex-review-avatar'; avatar.setAttribute('aria-hidden', 'true');
           const author = text('div', ''); author.className = 'flex-review-author';
-          const date = review.created_at.slice(0,10), time = text('time', date.split('-').reverse().join('.')); time.dateTime = date;
+          const time = timeElement(review.created_at);
           author.append(text('strong', review.name), time); head.append(avatar, author);
           if (review.rating) {
             const rating = text('div', ''); rating.className = 'flex-review-rating'; rating.setAttribute('role', 'img'); rating.setAttribute('aria-label', 'Оценка ' + review.rating + ' от 5');

@@ -1,7 +1,7 @@
 {
   "id": "flex/reviews",
   "name": "Flex Reviews",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Коментари и оценки за продукти с модерация.",
   "minimum_platform_version": "0.1.55",
   "entrypoint": "Flex\\Reviews\\ReviewsPlugin",
