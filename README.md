@@ -2,7 +2,7 @@
 
 Product comments and star ratings for Flex Commerce, with moderation, threaded replies, spam protection and optional email notifications.
 
-Version: **0.1.3** · ID: `flex/reviews` · Minimum Flex CMS version: **0.1.55**.
+Version: **0.2.0** · ID: `flex/reviews` · Minimum Flex CMS version: **0.1.62**.
 
 GitHub repository: `techsolutionbg/flex-reviews-plugin`.
 

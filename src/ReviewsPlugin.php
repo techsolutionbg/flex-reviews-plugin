@@ -24,9 +24,12 @@ final class ReviewsPlugin implements PluginInterface, BootablePluginInterface, U
         $context->routes?->admin(['GET', 'POST'], '/comments', AdminController::class, 'comments');
         $context->routes?->admin(['GET', 'PUT'], '/settings', AdminController::class, 'settings');
         $context->admin?->page('comments', 'Коментари', 'assets/admin.js', false, ['group' => 'commerce', 'icon' => 'file-text', 'section' => 'customers', 'order' => 2]);
-        $context->api->addFilter('commerce.product.tabs', static function (mixed $tabs, array $data): mixed {
+        $assets = $context->assets ?? null;
+        $context->api->addFilter('commerce.product.tabs', static function (mixed $tabs, array $data) use ($assets): mixed {
             $store = new ReviewStore(); $settings = $store->settings();
             if (!$settings['enabled'] || ($data['quick_view'] ?? false)) return $tabs;
+            // The comment files load only on product pages that show the comments.
+            $assets?->enqueue('reviews');
             $product = $data['product']; $listing = $store->listing((int) $product['id']);
             $twig = new \Twig\Environment(new \Twig\Loader\FilesystemLoader(__DIR__ . '/../templates'), ['autoescape' => 'html', 'strict_variables' => true]);
             $twig->addFunction(new \Twig\TwigFunction('flex_time', [self::class, 'time'], ['is_safe' => ['html']]));
